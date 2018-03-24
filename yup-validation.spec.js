@@ -100,7 +100,17 @@ describe('yup', () => {
       });
     });
 
-    describe('mix()', () => {
+    describe('boolean()', () => {
+      it('validates booleans', () => {
+        const schema = yup.boolean();
+        expect(schema.isValidSync(true)).toBe(true);
+        expect(schema.isValidSync('false')).toBe(true);
+        expect(schema.isValidSync('FALSE')).toBe(true);
+        expect(schema.isValidSync('boom')).toBe(false);
+      });
+    });
+
+    describe('mixed()', () => {
       it('validates "any" type', () => {
         const schema = yup.mixed();
         expect(schema.isValidSync(3)).toBe(true);
@@ -110,13 +120,13 @@ describe('yup', () => {
 
     describe('test()', () => {
       it('adds a function to the schema validation', () => {
-        const schema = yup
-          .string()
-          .test(
-            'is-stefan',
-            '${path} is not Stefan',
-            value => value === 'stefan'
-          );
+        const schema = yup.string().test({
+          name: 'is-stefan',
+          message: '${path} is not Stefan',
+          test: function(value) {
+            return value === 'stefan';
+          }
+        });
         expect(schema.isValidSync('stefan')).toBe(true);
         expect(schema.isValidSync('something')).toBe(false);
       });
