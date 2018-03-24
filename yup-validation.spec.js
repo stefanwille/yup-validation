@@ -1,35 +1,41 @@
 const { object, number, string } = require('yup');
 
 describe('yup', () => {
-  describe('isValid()', () => {
-    it('returns true if the given object is valid', async () => {
+  describe('isValidSync()', () => {
+    it('returns whether if the given object is valid', async () => {
+      const schema = number();
+      expect(schema.isValidSync(30)).toBe(true);
+      expect(schema.isValidSync('NO')).toBe(false);
+    });
+
+    it('validates optional values', () => {
+      const schema = number();
+      expect(schema.isValidSync(undefined)).toBe(true);
+    });
+
+    it('validates required', () => {
+      const schema = number().required();
+      expect(schema.isValidSync(undefined)).toBe(false);
+    });
+
+    it('validates object schemas', () => {
+      const objectSchema = object({
+        name: string().required(),
+        age: number().required()
+      });
+
+      expect(objectSchema.isValidSync({ name: 'jimmy', age: 27 })).toBe(true);
+      expect(
+        objectSchema.isValidSync({ name: 'jimmy', age: 'not-a-number' })
+      ).toBe(false);
+    });
+  });
+
+  describe('isValid()', async () => {
+    it('returns a Promise indicating if the given object is valid', async () => {
       const schema = number();
       expect(await schema.isValid(30)).toBe(true);
       expect(await schema.isValid('NO')).toBe(false);
-    });
-
-    it('validates required', async () => {
-      const optionalSchema = number();
-      expect(await optionalSchema.isValid(30)).toBe(true);
-      expect(await optionalSchema.isValid(undefined)).toBe(true);
-      const requiredSchema = number().required();
-      expect(await requiredSchema.isValid(30)).toBe(true);
-      expect(await requiredSchema.isValid(undefined)).toBe(false);
-    });
-
-    it('validates object schemas', async () => {
-      const objectSchema = object({
-        name: string().required(),
-        age: number()
-          .required()
-          .positive()
-          .integer()
-      });
-
-      expect(await objectSchema.isValid({ name: 'jimmy', age: 27 })).toBe(true);
-      expect(
-        await objectSchema.isValid({ name: 'jimmy', age: 'not-a-number' })
-      ).toBe(false);
     });
 
     describe('validate()', () => {
