@@ -2,7 +2,7 @@ const yup = require('yup');
 
 describe('yup', () => {
   describe('isValidSync()', () => {
-    it('returns whether if the given object is valid', async () => {
+    it('returns whether the given object is valid', async () => {
       const schema = yup.number();
       expect(schema.isValidSync(30)).toBe(true);
       expect(schema.isValidSync('NO')).toBe(false);
@@ -18,9 +18,9 @@ describe('yup', () => {
   });
 
   describe('validateSync()', () => {
-    it('returns the converted object on success', () => {
+    it('returns the cast object on success', () => {
       const schema = yup.number();
-      expect(schema.validateSync(30)).toBe(30);
+      expect(schema.validateSync('30')).toBe(30);
     });
 
     it('throws on validation failure', () => {
@@ -105,6 +105,20 @@ describe('yup', () => {
         const schema = yup.mixed();
         expect(schema.isValidSync(3)).toBe(true);
         expect(schema.isValidSync('YES')).toBe(true);
+      });
+    });
+
+    describe('test()', () => {
+      it('adds a function to the schema validation', () => {
+        const schema = yup
+          .string()
+          .test(
+            'is-stefan',
+            '${path} is not Stefan',
+            value => value === 'stefan'
+          );
+        expect(schema.isValidSync('stefan')).toBe(true);
+        expect(schema.isValidSync('something')).toBe(false);
       });
     });
   });
