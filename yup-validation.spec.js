@@ -33,16 +33,33 @@ describe('yup', () => {
     });
 
     describe('validate()', () => {
-      it('returns the converted object on success', async () => {
+      it('returns a Promise with the converted object on success', async () => {
         const schema = number();
         expect(await schema.validate(30)).toBe(30);
         expect(await schema.validate('30')).toBe(30);
       });
 
-      it('throws an error if invalid', async () => {
+      it('throws on validation failure', async () => {
         const schema = number();
         try {
           await schema.validate('NO');
+          fail();
+        } catch (error) {
+          expect(error.message).toMatch(/must be a `number` type/);
+        }
+      });
+    });
+
+    describe('validateSync()', () => {
+      it('returns the converted object on success', () => {
+        const schema = number();
+        expect(schema.validateSync(30)).toBe(30);
+      });
+
+      it('throws on validation failure', () => {
+        const schema = number();
+        try {
+          expect(schema.validateSync('boom')).toBe(30);
           fail();
         } catch (error) {
           expect(error.message).toMatch(/must be a `number` type/);
